@@ -1,3 +1,7 @@
+import numpy as np
+from sklearn.cluster import KMeans
+
+
 def k_means(n_clusters,data,max_iter):
     """
     Renvoie un tuple contenant:
