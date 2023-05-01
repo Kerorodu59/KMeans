@@ -17,7 +17,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn import datasets
 
-
+np.random.seed(0)
 iris = datasets.load_iris()
 X = iris["data"]
 
@@ -75,7 +75,7 @@ def intra_cluster_variance(centroid: list[list[float]],cluster: dict[int,list[fl
     """
     res = 0
     for i in range(len(centroid)):
-        distance = np.array(cluster[i])-centroid[i]
+        distance = np.array(cluster[i]-centroid[i])
         res += np.sum(np.linalg.norm(distance,axis=1)**2)
     return res
 
@@ -84,12 +84,28 @@ def rand_index(labelTrue,labelPredicted):
     Calcule le taux de représentativité de labelPredicted par rapport à labelTrue
     Plus la valeur est proche de 1 et plus les labels sont bien prédits
     """
-    corresponding_label = sum([1 for i in range(len(labelTrue)) if labelTrue[i]==labelPredicted[i]])
-    return corresponding_label/len(labelTrue)    
+    cluster = list(set(labelTrue))
+    cluster1 = [0 for i in range(len(cluster))]
+    cluster2 = [0 for i in range(len(cluster))]
+    
+    for i in range(len(labelTrue)):
+        
+        for j in range(len(cluster)) :
+            if cluster[j] == labelTrue[i]:
+                cluster1[j]+= 1
+            if cluster[j] == labelPredicted[i]:
+                cluster2[j]+= 1
+        
+    cluster1.sort()
+    cluster2.sort()
+    
+    cluster = np.min(np.array([cluster1,cluster2]),axis=0)
+    
+    return (np.sum(cluster))/len(labelTrue)  
 
 
 if __name__ == '__main__':
     center,cluster,label = k_means(2,X,500)
     kmeans = KMeans(n_clusters=2,random_state=0,max_iter=500).fit(X)
-    print("Intra-variance cluster of the function : ",intra_cluster_variance(center,X))
+    print("Intra-variance cluster of the function : ",intra_cluster_variance(center,cluster))
     print("Rand Index of the function :", rand_index(kmeans.labels_,label))
