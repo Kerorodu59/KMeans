@@ -1,7 +1,30 @@
+"""
+Fonction calculant les informations relatives au k-mode
+Usage:
+======
+    python KMode.py 
+"""
+
+__authors__ = ("Audrey")
+__contact__ = ("audrey.bilon.etu@univ-lille.fr")
+__copyright__ = "CRISTAL"
+__date__ = "2023-05-02"
+
 import pandas as pd
 import numpy as np
+from KMeans import rand_index
 
 np.random.seed(0)
+
+def IVC_KModes(centroid,cluster):
+    """
+    Calcul l'intra-cluster-variance
+    """
+    res = 0
+    for i in range(len(centroid)):
+        for j in range(len(cluster[i])) :
+            res += dissimilarity(cluster[i].loc[j],centroid[i])**2
+    return res
 
 def dissimilarity(pointA,pointB):
     """
@@ -35,7 +58,7 @@ def k_modes(n_clusters,data,max_iter):
     centers= [data.iloc[np.random.randint(0,len(data)-1)] for i in range(n_clusters)] 
     not_same_as_before = True
     i=0
-     
+
     while (not_same_as_before and i!=max_iter):
         
         label = []
@@ -69,8 +92,9 @@ if __name__ == '__main__':
     Df = pd.read_csv("Données/bank.csv",sep=";")
     Df = Df[['age','job', 'marital', 'education', 'default', 'housing', 
 'loan','contact','month','poutcome']]
-    print("dissimilarity : ",dissimilarity(Df.iloc[0],Df.iloc[1]))
-    print("New centroid : ",new_centroid(Df.iloc[0:10]))
     print("Test de la fonction K-Mode : ")
-    center, cluster, label = k_modes(2,Df,100)
-    print(center)
+    center2, cluster2, label2 = k_modes(2,Df,100)
+    center3, cluster3, label3 = k_modes(3,Df,100)
+    print("L'IVC avec K=2 des données est : ", IVC_KModes(center2,cluster2))
+    print("L'IVC avec K=3 des données est : ", IVC_KModes(center3,cluster3))
+    print("K=3 nous donne un cluster avec une meilleure IVC")

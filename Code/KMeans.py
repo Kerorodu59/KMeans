@@ -1,11 +1,8 @@
 """
-Fonction calculant le k-mean des données
+Fonction calculant les informations relatives au k-means
 Usage:
 ======
-    python nom_de_ce_super_script.py argument1 argument2
-
-    argument1: un entier signifiant un truc
-    argument2: une chaîne de caractères décrivant un bidule
+    python KMeans.py 
 """
 
 __authors__ = ("Audrey")
@@ -26,8 +23,8 @@ def k_means(n_clusters,data,max_iter):
     """
     Renvoie un tuple contenant:
     - la liste des centres de chaque cluster
-    - label contenant les clusters correspondants de chaque points
-    chaque liste est associé à la valeur du numéro du cluster auquel il correspond 
+    - un dictionnaire contenant les clusters (sous forme de liste) associés à leurs numéros de cluster 
+    - une liste (label) contenant le numéro du cluster auquel est associé chaque point.
     """
     centroid = []
     cluster_not_the_same = True
