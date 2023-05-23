@@ -12,45 +12,11 @@ __date__ = "2023-05-02"
 
 import pandas as pd
 import numpy as np
-from KMeans import rand_index
+from Metriques import *
+from Outils import *
 
 np.random.seed(0)
 
-def IVC_KModes(centroid,cluster):
-    """
-    Calcul l'intra-cluster-variance
-    """
-    res = 0
-    for i in range(len(centroid)):
-        for j in range(len(cluster[i])) :
-            res += dissimilarity(cluster[i].loc[j],centroid[i])**2
-    return res
-
-def dissimilarity(pointA,pointB):
-    """
-    Renvoie l'indice de dissimilarité 
-    Plus il est élevé et plus la distance entre les deux points est grande
-    """
-    
-    res = sum([1 for k in pointA.index if pointA[k] != pointB[k]])
-    
-    return res
-
-
-def new_centroid(cluster):
-    """
-    Renvoie le centre d'un cluster catégorical
-    """
-    centroid = []
-    
-    for k in cluster.columns :
-        values = dict((i,cluster[cluster[k]==i].shape[0]) for i in set(cluster[k])) 
-        
-        centroid.append(max(values,key=values.get))
-        
-    serie = pd.Series(data=centroid,index=cluster.columns)
-        
-    return serie
 
 def k_modes(n_clusters,data,max_iter):
     
