@@ -1,8 +1,5 @@
 """
-Fonction calculant les informations relatives au k-mode
-Usage:
-======
-    python KMode.py 
+KMode, Fonction calculant les clusters de donnée numérique
 """
 
 __authors__ = ("Audrey")
@@ -18,35 +15,46 @@ from Outils import *
 np.random.seed(0)
 
 
-def k_modes(n_clusters,data,max_iter):
+def k_modes(K,data,max_iter):
+    """Renvoie les informations relatives aux clusters obtenu grâce à KModes
+
+    Args:
+        K (int): nombre de clusters voulus
+        data (DataFrame): datasets étudié
+        max_iter (int): nombre d'itération réalisable par l'algorithme
+
+    Returns:
+        (DataFrame,dict(int,DataFrame),list(int)) :
+        les éléments retournés dans le tuple sont les suivants :
+            - DataFrame comportant les centres des clusters
+            - dictionnaire des clusters avec leurs numéros associés 
+            - labels de chaque échantillons contenus dans une liste
+    """
     
     #Initialisation des centres choisis aléatoirement
-    centers= [data.iloc[np.random.randint(0,len(data)-1)] for i in range(n_clusters)] 
+    centers= k_modes_center(K,data)
     not_same_as_before = True
     i=0
-
+    
     while (not_same_as_before and i!=max_iter):
         
         label = []
         i+=1
         # Remise à zéro de clusters
-        cluster = dict((i,pd.DataFrame(columns=data.columns)) for i in range(n_clusters))
+        cluster = dict((i,pd.DataFrame(columns=data.columns)) for i in range(K))
         
         for d in range(data.shape[0]):
             
-            # Recherche le centre le plus proche du point
-            minimum_center = min([(dissimilarity(centers[i],data.iloc[d]),i) for i in range(n_clusters)])
-            # L'associe à son cluster et ajoute le label du point à la liste des labels
+            minimum_center = min([(dissimilarity(centers.iloc[i],data.iloc[d]),i) for i in range(K)])
+            
             cluster[minimum_center[1]].loc[len(cluster[minimum_center[1]])] = data.iloc[d]
             label.append(minimum_center[1])
             
         # Recalcule les centres
-        new_center = []
-        for i in range(n_clusters):
-            new_center.append(new_centroid(cluster[i]))
+        new_center = pd.concat([new_centroid_KMode(cluster[i]) for i in range(K)],ignore_index=True)
         
         # On regarde si les centres sont toujours les mêmes
-        if (np.array_equal(new_center,centers)): 
+        if (new_center.equals(centers)): 
             not_same_as_before = False
         else:
             centers=new_center

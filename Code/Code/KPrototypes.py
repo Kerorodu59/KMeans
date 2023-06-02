@@ -1,3 +1,13 @@
+"""
+KPrototype, Fonction calculant les clusters de données catégoriques et numériques.
+"""
+
+__authors__ = ("Audrey")
+__contact__ = ("audrey.bilon.etu@univ-lille.fr")
+__copyright__ = "CRISTAL"
+__date__ = "2023-05-02"
+
+
 import numbers
 from sklearn.preprocessing import minmax_scale
 from numpy.random import randint
@@ -9,8 +19,20 @@ from Metriques import *
 
 
 def KPrototype(K,data,max_iter,gamma):
-    """
-    
+    """Renvoie des informations concernant les clusters formés par l'algorithme KPrototype
+
+    Args:
+        K (int): nombre de clusters voulus
+        data (DataFrame): datasets étudié
+        max_iter (int): nombre d'itération réalisable par l'algorithme
+        gamma (float) : poids des données catégorielles
+
+    Returns:
+        (DataFrame,dict(int,DataFrame),list(int)) :
+        les éléments retournés dans le tuple sont les suivants :
+            - DataFrame comportant les centres des clusters
+            - dictionnaire des clusters avec leurs numéros associés 
+            - labels de chaque échantillons contenus dans une liste
     """
     # Tri des clés ayant des valeurs catégoriques et numériques
     number_keys = []
@@ -51,7 +73,7 @@ def KPrototype(K,data,max_iter,gamma):
     
         
         # Recalcule les centres
-        new_centers= [new_centroid(cluster[i],number_keys,categorical_keys) for i in range(K)]
+        new_centers= [new_centroid_KProt(cluster[i],number_keys,categorical_keys) for i in range(K)]
         new_centers = pd.concat(new_centers,axis=0)
         
         if (np.array_equal(new_centers,centers)): 
@@ -60,8 +82,6 @@ def KPrototype(K,data,max_iter,gamma):
             centers=new_centers
         
     return (new_centers,cluster,label) 
-
-
 
 
 

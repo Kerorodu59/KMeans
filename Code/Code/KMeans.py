@@ -1,5 +1,5 @@
 """
-Fonction calculant les informations relatives au k-means
+KMeans, fonction qui permet de calculer les clusters de données numériques uniquement
 Usage:
 ======
     python KMeans.py 
@@ -23,10 +23,22 @@ X = iris["data"]
 
 def k_means(K,data,max_iter,function_initial_centers):
     """
-    Renvoie un tuple contenant:
-    - la liste des centres de chaque cluster
-    - un dictionnaire contenant les clusters (sous forme de liste) associés à leurs numéros de cluster 
-    - une liste (label) contenant le numéro du cluster auquel est associé chaque point.
+    Renvoie les informations concernant les K clusters obtenus à partie du dataset numérique
+    
+    Args:
+        K (int) : le nombre de clusters que nous voulons avoir 
+        data (list(list(float))) : Dataset représenté par une liste d'échantillons (sous liste de nombres)
+        max_iter (int) : nombre qui indique le nombre d'itérations maximum que la fonction peut réaliser.
+        function_initial_centers ((int,list(list(float)))->list(list(float))) : fonction qui permet de calculer 
+        les centres initiaux
+
+    Returns:
+        (list(list(float)),dict(int,list(list(float))),list(int)) :
+        les éléments retournés dans le tuple sont les suivants :
+            - liste des centres (sous forme de liste de floattant)
+            - dictionnaire des clusters avec leurs numéros associés 
+            - labels de chaque échantillons contenus dans une liste
+        
     """
     centroid = []
     cluster_not_the_same = True

@@ -1,10 +1,26 @@
+"""
+Fonctions calculant la justesse des informations obtenues par les algorithmes KMeans, KModes et KPrototype 
+"""
+
+__authors__ = ("Audrey")
+__contact__ = ("audrey.bilon.etu@univ-lille.fr")
+__copyright__ = "CRISTAL"
+__date__ = "2023-05-02"
+
 import numpy as np
 from math import *
 
 # Métrique de KMeans
 def IVC_Kmeans(centroid,cluster):
-    """
-    Calcul l'intra-cluster-variance
+    """Calcul l'intra-cluster variance pour KMeans
+    
+    Args:
+        centroid (list(list(float))) : liste représentant les centres sous forme de liste d'entiers.
+        cluster (dict(int,list(list(float)))): dictionnaire représentant le cluster par son label(int) 
+        et les éléments qui compose le cluster (sa valeur associée) sous forme de liste d'échantillons (list(int))
+
+    Returns:
+        int : intra cluster variance
     """
     res = 0
     for i in range(len(centroid)):
@@ -16,7 +32,15 @@ def IVC_Kmeans(centroid,cluster):
 # Métrique de KModes
 def IVC_KModes(centroid,cluster):
     """
-    Calcul l'intra-cluster-variance
+    Calcul l'intra-cluster-variance pour KModes
+    
+    Args:
+        centroid (DataFrame) : DataFrame des centres
+        cluster (dict(int,DataFrame)): dictionnaire représentant le cluster par son label(int) 
+        et les éléments qui compose le cluster (sa valeur associée)
+
+    Returns:
+        int : intra cluster variance 
     """
     res = 0
     for i in range(len(centroid)):
@@ -28,6 +52,7 @@ def dissimilarity(pointA,pointB):
     """
     Renvoie l'indice de dissimilarité 
     Plus il est élevé et plus la distance entre les deux points est grande
+    (pour plus de documentation regarder Outils.py)
     """
     
     res = sum([1 for k in pointA.index if pointA[k] != pointB[k]])
@@ -36,6 +61,16 @@ def dissimilarity(pointA,pointB):
 
 # Métriques utilisables pour toutes les fonctions 
 def rand_index(labelTrue,labelPredicted):
+    """Renvoie le rand index calculé 
+
+    Args:
+        labelTrue (list(int)): liste des labels de chaque point lorsque le cluster est bien calculé
+        labelPredicted (list(int)): liste des labels de chaque point lorsque le cluster est calculé avec 
+        l'algorithme
+
+    Returns:
+        float: rand index, plus il est proche de 1 et plus les résultats obtenus par l'algorithme sont bons.
+    """
     # Initialisation de la table de groupement et séparation des données
     table = np.zeros((2,2))
     
@@ -61,6 +96,14 @@ def Accuracy(labelTrue,labelPredicted):
     """
     Calcule le taux de représentativité de labelPredicted par rapport à labelTrue
     Plus la valeur est proche de 1 et plus les labels sont bien prédits
+
+    Args:
+        labelTrue (list(int)): liste des labels de chaque point lorsque le cluster est bien calculé
+        labelPredicted (list(int)): liste des labels de chaque point lorsque le cluster est calculé avec 
+        l'algorithme
+
+    Returns:
+        float: plus il est proche de 1 et plus les résultats obtenus par l'algorithme sont bons.   
     """
     clusterT = list(set(labelTrue))
     clusterP = list(set(labelPredicted))
@@ -87,6 +130,17 @@ def Accuracy(labelTrue,labelPredicted):
 
 
 def Adjusted_Rand_Index(labelTrue,labelPredicted):
+    """Calcul l'Adjusted Rand Index des deux partitions
+
+    Args:
+        labelTrue (list(int)): liste des labels de chaque point lorsque le cluster est bien calculé
+        labelPredicted (list(int)): liste des labels de chaque point lorsque le cluster est calculé avec 
+        l'algorithme
+
+    Returns:
+        float: plus adjusted rand index est proche de 1 et plus les résultats obtenus par l'algorithme sont exactes.
+    
+    """
     #Initialisation de la "contingency table"
     clusterPredicted, clusterTrue = list(set(labelPredicted)),list(set(labelTrue))
     X = np.zeros((len(clusterTrue),len(clusterPredicted)))

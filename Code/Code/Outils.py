@@ -1,11 +1,42 @@
+"""
+Fonctions intermédiaires de KModes, KMeans et KPrototype
+"""
+
+__authors__ = ("Audrey")
+__contact__ = ("audrey.bilon.etu@univ-lille.fr")
+__copyright__ = "CRISTAL"
+__date__ = "2023-05-02"
+
 import pandas as pd
 import numpy as np
 
 ### Fonctions utiles pour KMeans
 def random_centers(K,data):
+    """renvoie K centres choisis aléatoirement tel que chaque attribut soit dans 
+    l'espace réel du champ choisi
+
+    Args:
+        K (int): Nombre de centres voulus
+        data (list(list(float))): tableau contenant tous les échantillons (qui sont sous 
+        forme de tableau de nombre)
+
+    Returns:
+        list(list(float)): liste des centres (sous forme de liste d'échantillons)
+    """
     return [np.random.uniform(data.min(axis=0),data.max(axis=0)) for i in range(K)]
 
 def mean_centroid(K,data):
+    """renvoie K centres tels que chaque centre est la moyenne de parties composées d'échantillons
+    choisis aléatoirement dans data
+
+    Args:
+        K (int): Nombre de centres voulus
+        data (list(list(float))): tableau contenant tous les échantillons (qui sont sous 
+        forme de tableau de nombre)
+
+    Returns:
+        list(list(float)): liste des centres (sous forme de liste d'échantillons)
+    """
     centroid = []
     for i in range(K):
         centroid.append(data[i*data.shape[0]//K:(i+1)*data.shape[0]//K].mean(axis=0))
@@ -13,6 +44,15 @@ def mean_centroid(K,data):
 
 #### Fonctions utiles pour KModes
 def k_modes_center(K,data):
+    """Renvoie les K centres initiaux de K_Modes
+
+    Args:
+        K (int): nombre de centres souhaités
+        data (DataFrame): dataframe contenant les échantillons
+
+    Returns:
+        DataFrame: dataframe contenant les centres calculés
+    """
     values = []
     
     # On trie pour tous les attributs, les valeurs les plus courantes à celles qui se font plus rares
@@ -36,8 +76,14 @@ def k_modes_center(K,data):
 
 
 def new_centroid_KMode(cluster):
-    """
-    Renvoie le centre d'un cluster catégorical
+    """Calcule les nouveaux centres à partir des clusters
+    
+    Args:
+        cluster (dict(int,DataFrame)): dictionnaire représentant le cluster par son label(int) 
+        et les éléments qui compose le cluster (sa valeur associée)
+
+    Returns:
+        DataFrame: DataFrame des nouveaux centres 
     """
     centroid = []
     
@@ -51,9 +97,15 @@ def new_centroid_KMode(cluster):
     return df
 
 def dissimilarity(pointA,pointB):
-    """
-    Renvoie l'indice de dissimilarité 
+    """Renvoie l'indice de dissimilarité 
     Plus il est élevé et plus la distance entre les deux points est grande
+    
+    Args:
+        pointA (Serie): Un échantillon à comparer
+        pointB (Serie): l'autre échantillon à comparer
+
+    Returns:
+        int : distance entre les deux échantillons
     """
     
     res = sum([1 for k in pointA.index if pointA[k] != pointB[k]])
@@ -64,8 +116,16 @@ def dissimilarity(pointA,pointB):
 #### Fonction utiles pour KPrototypes
 
 def new_centroid_KProt(cluster,numerical_keys,categorical_keys):
-    """
-    Renvoie le centre d'un cluster catégorical
+    """Renvoie les nouveaux centres calculé en fonction d'un cluster mixte
+    
+    Args:
+        cluster (dict(int,DataFrame)): dictionnaire représentant le cluster par son label(int) 
+        et les éléments qui compose le cluster (sa valeur associée)
+        numerical_keys (list(str)) : liste des noms de champs de données numériques
+        categorical_keys (list(str)) : liste des noms de champs de données catégoriques
+
+    Returns:
+        DataFrame: DataFrame des nouveaux centres 
     """
     # Calcul des coordonnées numériques du nouveau centre du cluster
     centroid = [cluster[k].mean() for k in numerical_keys]
