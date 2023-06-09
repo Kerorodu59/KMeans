@@ -9,6 +9,8 @@ __date__ = "2023-05-02"
 
 import pandas as pd
 import numpy as np
+from math import *
+import numbers
 
 ### Fonctions utiles pour KMeans
 def random_centers(K,data):
@@ -115,6 +117,29 @@ def dissimilarity(pointA,pointB):
 
 #### Fonction utiles pour KPrototypes
 
+def preparation_donnees(Df):
+    """ Permet la préparation des données d'un DataFrame numériques et catégoriques
+    La fonction enlève les NaN présents dans le tableau pour les valeurs numériques
+    
+    Args:
+        Df (DataFrame) : DataFrame à modifier
+    
+    Returns:
+        DataFrame : DataFrame modifié
+    """
+    numerical = []
+    
+    for k in Df :
+        if isinstance(Df.iloc[0][k],numbers.Real) :
+            numerical.append(k)
+
+    for i in range(len(Df)):
+        if (Df.iloc[i].isna().any()):
+            for k in numerical :
+                if pd.isna(Df.iloc[i][k]):
+                    Df.loc[i,k] = Df[k].mean()
+    return Df
+
 def new_centroid_KProt(cluster,numerical_keys,categorical_keys):
     """Renvoie les nouveaux centres calculé en fonction d'un cluster mixte
     
@@ -139,3 +164,20 @@ def new_centroid_KProt(cluster,numerical_keys,categorical_keys):
     serie = pd.DataFrame(data=[centroid],columns=numerical_keys+categorical_keys)
         
     return serie
+
+def gamma_distance(pointA,pointB,gamma,numericalKeys,categoricalKeys) :
+    """Calcule la distance entre deux points qui sont numériques et catégoriques
+
+    Args:
+        pointA (Series): premier point à comparer
+        pointB (Series): second point à comparer
+        gamma (float): coefficient des points catégoriques
+        numericalKeys (list(str)): liste des noms des attributs numériques
+        categoricalKeys (list(str)): liste des noms des attributs catégoriques
+
+    Returns:
+        float : distance entre les points A et B
+    """
+    res = np.linalg.norm(np.array(pointA[numericalKeys])-np.array(pointB[numericalKeys]))+gamma*dissimilarity(pointB[categoricalKeys],pointA[categoricalKeys])
+    return res
+

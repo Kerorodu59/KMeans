@@ -9,6 +9,7 @@ __date__ = "2023-05-02"
 
 import numpy as np
 from math import *
+import numbers
 
 # Métrique de KMeans
 def IVC_Kmeans(centroid,cluster):
@@ -161,3 +162,86 @@ def Adjusted_Rand_Index(labelTrue,labelPredicted):
     max_RI = 0.5 * (sum([comb(n,2) for n in A])+sommeB)
     
     return (RI-E)/(max_RI-E)
+
+def Sil_KMeans(cluster,distance):
+    """Fonction permettant de calculer la silhouette de clusters de données numériques 
+
+    Args:
+        cluster (dict(int,numpy array)): Clusters avec les numéros du clusters et ses valeurs associées
+        distance ((nparray,nparray)->float): Fonction qui à partir de deux points renvoient la distance entre ces points 
+
+    Returns:
+        float: la silhouette contenu entre -1 et 1
+    """
+    
+    sc = 0
+    for c in range(len(cluster)):
+        sc_ = 0
+        for i in cluster[c]:
+            ai = sum([distance(i,cluster[c][a]) for a in range(len(cluster[c]))])/(len(cluster[c])-1)
+            bi = []
+            for oc in range(len(cluster)): 
+                if c!=oc :
+                    bi.append(sum([distance(i,cluster[oc][b]) for b in range(len(cluster[oc]))])/len(cluster[oc])) 
+            sc_ += (min(bi)-ai)/max(ai,min(bi))
+        sc += sc_/len(cluster[c])
+    s = sc/len(cluster) 
+    return s  
+
+def Sil_KModes(cluster):
+    """Fontions permettant de calculer la silhouette de clusters de données catégoriques
+
+    Args:
+        cluster (dict(int,DataFrame)): Clusters avec les numéros du clusters et ses valeurs associées
+
+    Returns:
+        float: la silhouette contenu entre -1 et 1
+    """
+    sc = 0
+    for c in range(len(cluster)):
+        sc_ = 0
+        for i in range(len(cluster[c])):
+            ai = sum([dissimilarity(cluster[c].iloc[i],cluster[c].iloc[a]) for a in range(len(cluster[c]))])/(len(cluster[c])-1)
+            bi = []
+            for oc in range(len(cluster)): 
+                if c!=oc :
+                    bi.append(sum([dissimilarity(cluster[c].iloc[i],cluster[oc].iloc[b]) for b in range(len(cluster[oc]))])/len(cluster[oc])) 
+            sc_ += (min(bi)-ai)/max(ai,min(bi))
+        sc += sc_/len(cluster[c])
+    s = sc/len(cluster) 
+    return s  
+
+def silhouette(cluster,gamma):
+    """Fontions permettant de calculer la silhouette de clusters de données catégoriques et numériques
+
+    Args:
+        cluster (dict(int,DataFrame)): Clusters avec les numéros du clusters et ses valeurs associées
+        gamma (float) : Coefficient de calcul qui a permis de calculer les clusters, il permet de donner un poid aux valeurs catégoriques 
+        lors du calcul des distances
+
+    Returns:
+        float: la silhouette contenu entre -1 et 1
+    """
+    numerical = []
+    categorical = []
+    
+    for k in cluster[0] :
+        if isinstance(cluster[0].iloc[0][k],numbers.Real) :
+            numerical.append(k)
+        else:
+            categorical.append(k)
+    
+    sc = 0
+    for c in range(len(cluster)):
+        sc_ = 0
+        for i in range(len(cluster[c])):
+            ai = sum([gamma_distance(cluster[c].iloc[i],cluster[c].iloc[a],gamma,numerical,categorical) for a in range(len(cluster[c]))])/(len(cluster[c])-1)
+            bi = []
+            for oc in range(len(cluster)): 
+                if c!=oc :
+                    bi.append(sum([gamma_distance(cluster[c].iloc[i],cluster[oc].iloc[b],gamma,numerical,categorical) for b in range(len(cluster[oc]))])/len(cluster[oc])) 
+            
+            sc_ += (min(bi)-ai)/max(ai,min(bi))
+        sc += sc_/len(cluster[c])
+    s = sc/len(cluster) 
+    return s  
